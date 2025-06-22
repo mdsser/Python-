@@ -1,0 +1,6 @@
+file = open('itheima.txt','w')
+file.write('hello world')
+file.write('\n')
+content = file.read(12)
+print(content)
+file.close()

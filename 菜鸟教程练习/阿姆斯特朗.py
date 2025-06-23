@@ -18,3 +18,4 @@ if num == sum:
 else:
     print(num, "不是阿姆斯特朗数")
 
+

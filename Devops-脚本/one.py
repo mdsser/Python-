@@ -1,5 +1,5 @@
 import platform
-import os
+import psutil
 import socket
 
 # 代码解析
@@ -28,10 +28,10 @@ def get_system_info():
 
 def get_disk_usage():
     print("\n=== 磁盘使用情况 ===")
-    partitions = os.partitions()
+    partitions = psutil.disk_partitions()
     for part in partitions:
         try:
-            usage = os.disk_usage(part.mountpoint)
+            usage = psutil.disk_usage(part.mountpoint)
             print(f"挂载点: {part.mountpoint}")
             print(f"  总空间: {usage.total / (1024**3):.2f} GB")
             print(f"  已用空间: {usage.used / (1024**3):.2f} GB")

@@ -1,32 +1,28 @@
+import filecmp
 import os
 import shutil
 import paramiko
 from scp import SCPClient
-import logging
 import time
-import filecmp
+import logging
 
-# 配置日志记录
-logging.basicConfig(filename='log_collector.log', level=logging.INFO)
-
+logging.basicConfig(filename = 'log_collector.log', level=logging.INFO)
 def collect_logs(local_log_dir, backup_log_dir):
     if not os.path.exists(backup_log_dir):
         os.makedirs(backup_log_dir)
 
-    for root, _, files in os.walk(local_log_dir):
+    for root,_ , files in os.walk(local_log_dir):
         for file in files:
-            local_path = os.path.join(root, file)
-            backup_path = os.path.join(backup_log_dir, file)
+            local_path = os.path.join(root,file)
+            backup_path = os.path.join(backup_log_dir,file)
 
-            # 检查文件是否已经存在且相同
             if os.path.exists(backup_path) and filecmp.cmp(local_path, backup_path, shallow=False):
-                logging.info(f"文件 {local_path} 已存在且相同，跳过")
+                logging.info(f"文件：{local_path} 已存在且相同，跳过")
                 continue
 
             # 复制文件到备份目录
             shutil.copy2(local_path, backup_path)
-            logging.info(f"收集日志: {local_path} -> {backup_path}")
-
+            logging.info(f"收集日志: {local_path} => {backup_path}")
     return backup_log_dir
 
 def upload_logs(backup_log_dir, remote_host, remote_dir, username, password=None, key_filename=None):
@@ -36,27 +32,27 @@ def upload_logs(backup_log_dir, remote_host, remote_dir, username, password=None
     ssh.connect(remote_host, username=username, password=password, key_filename=key_filename)
 
     with SCPClient(ssh.get_transport()) as scp:
-        for root, _, files in os.walk(backup_log_dir):
+        for root,_ , files in os.walk(backup_log_dir):
             for file in files:
-                local_path = os.path.join(root, file)
+                local_path = os.path.join(root,file)
                 remote_path = os.path.join(remote_dir, os.path.relpath(local_path, backup_log_dir))
 
                 # 上传文件到远程服务器
                 scp.put(local_path, remote_path)
-                logging.info(f"上传日志: {local_path} -> {remote_host}:{remote_path}")
+                logging.info(f"上传日志: {local_path} => {remote_path}")
 
     ssh.close()
-    logging.info("日志上传完成")
+    logging.info(f"日志上传完成")
 
 if __name__ == '__main__':
-    LOCAL_LOG_DIR = "/var/log"
-    BACKUP_LOG_DIR = "/tmp/logs"
-    REMOTE_HOST = "log.server.com"
-    REMOTE_DIR = "/logs"
-    USERNAME = "ops"
-    PASSWORD = "your_password"  # 或者使用 key_filename
+    local_log_dir = "/var/log"
+    backup_log_dir = "/tmp/logs"
+    remote_host = "log.server.com"
+    remote_dir = "/logs"
+    username = "ops"
+    password = "123456"
 
     while True:
-        collect_logs(LOCAL_LOG_DIR, BACKUP_LOG_DIR)
-        upload_logs(BACKUP_LOG_DIR, REMOTE_HOST, REMOTE_DIR, USERNAME, PASSWORD)
-        time.sleep(3600)  # 每小时运行一次
+        collect_logs(local_log_dir, backup_log_dir)
+        upload_logs(backup_log_dir, remote_host, remote_dir, username, password)
+        time.sleep(3600)

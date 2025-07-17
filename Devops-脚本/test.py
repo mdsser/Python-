@@ -1,62 +1,96 @@
 import os
-import shutil
-import paramiko
-from scp import SCPClient
-import logging
 import time
-import filecmp
+import smtplib
+from email.mime.text import MIMEText
+import logging
+from datetime import datetime, timedelta
 
-# 配置日志记录
-logging.basicConfig(filename='log_collector.log', level=logging.INFO)
+# 配置日志
+logging.basicConfig(
+    filename='/var/log/tmp_cleaner.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
-def collect_logs(local_log_dir, backup_log_dir):
-    if not os.path.exists(backup_log_dir):
-        os.makedirs(backup_log_dir)
 
-    for root, _, files in os.walk(local_log_dir):
-        for file in files:
-            local_path = os.path.join(root, file)
-            backup_path = os.path.join(backup_log_dir, file)
+def clean_tmp_directory(max_age=7, exclude_extensions=None):
+    """清理/tmp目录旧文件"""
+    if exclude_extensions is None:
+        exclude_extensions = ['.sock', '.pid']  # 默认排除的扩展名
 
-            # 检查文件是否已经存在且相同
-            if os.path.exists(backup_path) and filecmp.cmp(local_path, backup_path, shallow=False):
-                logging.info(f"文件 {local_path} 已存在且相同，跳过")
-                continue
+    tmp_dir = "/tmp"
+    now = time.time()
+    cutoff = now - (max_age * 86400)  # 转换为秒
 
-            # 复制文件到备份目录
-            shutil.copy2(local_path, backup_path)
-            logging.info(f"收集日志: {local_path} -> {backup_path}")
+    deleted_files = []
+    protected_files = []
 
-    return backup_log_dir
+    for filename in os.listdir(tmp_dir):
+        filepath = os.path.join(tmp_dir, filename)
 
-def upload_logs(backup_log_dir, remote_host, remote_dir, username, password=None, key_filename=None):
-    ssh = paramiko.SSHClient()
-    ssh.load_system_host_keys()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(remote_host, username=username, password=password, key_filename=key_filename)
+        # 跳过目录和特殊文件
+        if os.path.isdir(filepath):
+            continue
 
-    with SCPClient(ssh.get_transport()) as scp:
-        for root, _, files in os.walk(backup_log_dir):
-            for file in files:
-                local_path = os.path.join(root, file)
-                remote_path = os.path.join(remote_dir, os.path.relpath(local_path, backup_log_dir))
+        # 检查文件扩展名是否在排除列表
+        _, ext = os.path.splitext(filename)
+        if ext.lower() in exclude_extensions:
+            protected_files.append(filename)
+            continue
 
-                # 上传文件到远程服务器
-                scp.put(local_path, remote_path)
-                logging.info(f"上传日志: {local_path} -> {remote_host}:{remote_path}")
+        # 检查文件修改时间
+        file_mtime = os.path.getmtime(filepath)
+        if file_mtime < cutoff:
+            try:
+                os.remove(filepath)
+                deleted_files.append(filename)
+                logging.info(f"删除文件: {filename}")
+            except Exception as e:
+                logging.error(f"删除失败 {filename}: {str(e)}")
 
-    ssh.close()
-    logging.info("日志上传完成")
+    return {
+        "deleted": deleted_files,
+        "protected": protected_files
+    }
 
-if __name__ == '__main__':
-    LOCAL_LOG_DIR = "/var/log"
-    BACKUP_LOG_DIR = "/tmp/logs"
-    REMOTE_HOST = "log.server.com"
-    REMOTE_DIR = "/logs"
-    USERNAME = "ops"
-    PASSWORD = "your_password"  # 或者使用 key_filename
 
-    while True:
-        collect_logs(LOCAL_LOG_DIR, BACKUP_LOG_DIR)
-        upload_logs(BACKUP_LOG_DIR, REMOTE_HOST, REMOTE_DIR, USERNAME, PASSWORD)
-        time.sleep(3600)  # 每小时运行一次
+def send_clean_report(report_data, recipient="admin@example.com"):
+    """发送清理报告邮件"""
+    deleted_count = len(report_data["deleted"])
+    protected_count = len(report_data["protected"])
+
+    body = f"""
+    /tmp目录清理报告:
+    - 删除文件: {deleted_count} 个
+    - 保护文件: {protected_count} 个
+
+    删除文件列表:
+    {os.linesep.join(report_data["deleted"][:20])}
+    {f"+ {deleted_count - 20} more..." if deleted_count > 20 else ""}
+    """
+
+    msg = MIMEText(body)
+    msg['Subject'] = f"服务器清理报告 - {datetime.now().strftime('%Y-%m-%d')}"
+    msg['From'] = "cleaner@server.com"
+    msg['To'] = recipient
+
+    try:
+        with smtplib.SMTP('smtp.example.com', 587) as server:
+            server.login('user', 'password')
+            server.send_message(msg)
+        logging.info("清理报告已发送")
+    except Exception as e:
+        logging.error(f"邮件发送失败: {str(e)}")
+
+
+def main():
+    """主清理流程"""
+    logging.info("开始执行/tmp目录清理")
+    report = clean_tmp_directory(max_age=7)
+    if report["deleted"]:
+        send_clean_report(report)
+    logging.info("清理任务完成")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>脚本列表</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>脚本列表</h1>
+    <a href="{{ url_for('upload_script') }}">上传脚本</a>
+    <ul>
+        {% for script in scripts %}
+        <li>
+            <a href="{{ url_for('script_detail', script_id=script.id) }}">{{ script.name }}</a>
+            <a href="{{ url_for('execute_script_route', script_id=script.id) }}">执行脚本</a>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

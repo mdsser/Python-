@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>自动化运维脚本平台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>欢迎来到自动化运维脚本平台</h1>
+    <a href="{{ url_for('script_list') }}">查看脚本列表</a>
+    <a href="{{ url_for('upload_script') }}">上传脚本</a>
+</body>
+</html>

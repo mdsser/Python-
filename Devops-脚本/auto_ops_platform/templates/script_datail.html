@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ script.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>{{ script.name }}</h1>
+    <div>
+        <h2>脚本内容</h2>
+        <pre>{{ script.content }}</pre>
+    </div>
+    {% if result %}
+    <div>
+        <h2>执行结果</h2>
+        <p>Return Code: {{ result.returncode }}</p>
+        <h3>标准输出</h3>
+        <pre>{{ result.stdout }}</pre>
+        <h3>标准错误</h3>
+        <pre>{{ result.stderr }}</pre>
+    </div>
+    {% endif %}
+    <a href="{{ url_for('script_list') }}">返回脚本列表</a>
+</body>
+</html>
+</title>
+</head>
+<body>
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!-- templates/dashboard.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>服务器监控</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>服务器监控仪表盘</h1>
+
+    <div style="display: flex;">
+        <div style="border: 1px solid #ccc; padding: 20px; margin: 10px;">
+            <h2>当前状态</h2>
+            <p>CPU: <span style="color: {{ 'red' if current[0] > 80 else 'orange' if current[0] > 60 else 'green' }}">{{ current[0] }}%</span></p>
+            <p>内存: {{ current[1] }}%</p>
+            <p>磁盘: {{ current[2] }}%</p>
+        </div>
+
+        <div style="width: 600px; margin: 10px;">
+            <canvas id="metricsChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const history = {{ history|tojson }};
+        const timestamps = history.map(item => item[0]);
+        const cpuData = history.map(item => item[1]);
+        const memData = history.map(item => item[2]);
+        const diskData = history.map(item => item[3]);
+
+        const ctx = document.getElementById('metricsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: timestamps,
+                datasets: [
+                    { label: 'CPU', data: cpuData, borderColor: 'red' },
+                    { label: '内存', data: memData, borderColor: 'blue' },
+                    { label: '磁盘', data: diskData, borderColor: 'green' }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 100
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

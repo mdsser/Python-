@@ -1,96 +1,85 @@
-import os
-import time
-import smtplib
-from email.mime.text import MIMEText
-import logging
-from datetime import datetime, timedelta
-
-# 配置日志
-logging.basicConfig(
-    filename='/var/log/tmp_cleaner.log',
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+import subprocess
+import sys
 
 
-def clean_tmp_directory(max_age=7, exclude_extensions=None):
-    """清理/tmp目录旧文件"""
-    if exclude_extensions is None:
-        exclude_extensions = ['.sock', '.pid']  # 默认排除的扩展名
-
-    tmp_dir = "/tmp"
-    now = time.time()
-    cutoff = now - (max_age * 86400)  # 转换为秒
-
-    deleted_files = []
-    protected_files = []
-
-    for filename in os.listdir(tmp_dir):
-        filepath = os.path.join(tmp_dir, filename)
-
-        # 跳过目录和特殊文件
-        if os.path.isdir(filepath):
-            continue
-
-        # 检查文件扩展名是否在排除列表
-        _, ext = os.path.splitext(filename)
-        if ext.lower() in exclude_extensions:
-            protected_files.append(filename)
-            continue
-
-        # 检查文件修改时间
-        file_mtime = os.path.getmtime(filepath)
-        if file_mtime < cutoff:
-            try:
-                os.remove(filepath)
-                deleted_files.append(filename)
-                logging.info(f"删除文件: {filename}")
-            except Exception as e:
-                logging.error(f"删除失败 {filename}: {str(e)}")
-
-    return {
-        "deleted": deleted_files,
-        "protected": protected_files
-    }
+def check_service_status(service_name):
+    result = subprocess.run(['sc', 'query', service_name], capture_output=True, text=True)
+    if 'RUNNING' in result.stdout:
+        return 'RUNNING'
+    elif 'STOPPED' in result.stdout:
+        return 'STOPPED'
+    else:
+        return 'UNKNOWN'
 
 
-def send_clean_report(report_data, recipient="admin@example.com"):
-    """发送清理报告邮件"""
-    deleted_count = len(report_data["deleted"])
-    protected_count = len(report_data["protected"])
+def get_service_details(service_name):
+    result = subprocess.run(['sc', 'qc', service_name], capture_output=True, text=True)
+    return result.stdout
 
-    body = f"""
-    /tmp目录清理报告:
-    - 删除文件: {deleted_count} 个
-    - 保护文件: {protected_count} 个
 
-    删除文件列表:
-    {os.linesep.join(report_data["deleted"][:20])}
-    {f"+ {deleted_count - 20} more..." if deleted_count > 20 else ""}
-    """
+def start_service(service_name):
+    result = subprocess.run(['net', 'start', service_name], capture_output=True, text=True)
+    if result.returncode == 0:
+        print(f'Service {service_name} started successfully.')
+    else:
+        print(f'Failed to start service {service_name}. Error: {result.stderr}')
 
-    msg = MIMEText(body)
-    msg['Subject'] = f"服务器清理报告 - {datetime.now().strftime('%Y-%m-%d')}"
-    msg['From'] = "cleaner@server.com"
-    msg['To'] = recipient
 
-    try:
-        with smtplib.SMTP('smtp.example.com', 587) as server:
-            server.login('user', 'password')
-            server.send_message(msg)
-        logging.info("清理报告已发送")
-    except Exception as e:
-        logging.error(f"邮件发送失败: {str(e)}")
+def stop_service(service_name):
+    result = subprocess.run(['net', 'stop', service_name], capture_output=True, text=True)
+    if result.returncode == 0:
+        print(f'Service {service_name} stopped successfully.')
+    else:
+        print(f'Failed to stop service {service_name}. Error: {result.stderr}')
+
+
+def restart_service(service_name):
+    stop_service(service_name)
+    start_service(service_name)
+
+
+def list_services():
+    result = subprocess.run(['sc', 'queryex', 'type=', 'service', 'state=', 'all'], capture_output=True, text=True)
+    services = result.stdout.split('\n')
+    service_list = []
+    for service in services:
+        if 'SERVICE_NAME:' in service:
+            service_name = service.split(':')[1].strip()
+            service_list.append(service_name)
+    return service_list
 
 
 def main():
-    """主清理流程"""
-    logging.info("开始执行/tmp目录清理")
-    report = clean_tmp_directory(max_age=7)
-    if report["deleted"]:
-        send_clean_report(report)
-    logging.info("清理任务完成")
+    if len(sys.argv) < 3:
+        print("Usage: python service_manager.py <action> <service_name>")
+        print("Actions: status, details, start, stop, restart, list")
+        return
+
+    action = sys.argv[1].lower()
+    service_name = sys.argv[2] if len(sys.argv) > 2 else None
+
+    if action == 'status' and service_name:
+        status = check_service_status(service_name)
+        print(f'Service {service_name} is {status}.')
+    elif action == 'details' and service_name:
+        details = get_service_details(service_name)
+        print(f'Details for service {service_name}:\n{details}')
+    elif action == 'start' and service_name:
+        start_service(service_name)
+    elif action == 'stop' and service_name:
+        stop_service(service_name)
+    elif action == 'restart' and service_name:
+        restart_service(service_name)
+    elif action == 'list':
+        services = list_services()
+        print("List of services:")
+        for service in services:
+            print(service)
+    else:
+        print("Invalid action or service name.")
+        print("Usage: python service_manager.py <action> <service_name>")
+        print("Actions: status, details, start, stop, restart, list")
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

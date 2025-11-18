@@ -1,0 +1,34 @@
+2025-08-08 20:34:02,289 - INFO - Starting system inspection
+2025-08-08 20:34:11,677 - WARNING - Failed to check cron jobs: 'utf-8' codec can't decode byte 0xce in position 2: invalid continuation byte
+2025-08-08 20:34:11,678 - ERROR - Error checking error logs in C:\Windows\System32\LogFiles\AppEvent.evt: [Errno 2] No such file or directory: 'C:\\Windows\\System32\\LogFiles\\AppEvent.evt'
+2025-08-08 20:34:11,900 - INFO - HTML report generated: report.html
+2025-08-08 20:34:11,907 - INFO - JSON report generated: report.json
+2025-08-08 20:34:11,907 - INFO - System inspection completed
+2025-08-08 20:35:39,570 - INFO - Starting system inspection
+2025-08-08 20:35:48,710 - WARNING - Failed to check cron jobs: 'utf-8' codec can't decode byte 0xce in position 2: invalid continuation byte
+2025-08-08 20:35:48,711 - ERROR - Error checking error logs in C:\Windows\System32\LogFiles\AppEvent.evt: [Errno 2] No such file or directory: 'C:\\Windows\\System32\\LogFiles\\AppEvent.evt'
+2025-08-08 20:35:48,934 - INFO - HTML report generated: my_report.html
+2025-08-08 20:35:48,941 - INFO - JSON report generated: my_report.json
+2025-08-08 20:35:48,941 - INFO - System inspection completed
+2025-08-08 22:00:13,058 - INFO - Starting system inspection
+2025-08-08 22:00:22,179 - WARNING - Failed to check cron jobs: 'utf-8' codec can't decode byte 0xce in position 2: invalid continuation byte
+2025-08-08 22:00:22,179 - ERROR - Error checking error logs in C:\Windows\System32\LogFiles\AppEvent.evt: [Errno 2] No such file or directory: 'C:\\Windows\\System32\\LogFiles\\AppEvent.evt'
+2025-08-08 22:00:22,398 - INFO - HTML report generated: my_report.html
+2025-08-08 22:00:22,409 - INFO - JSON report generated: my_report.json
+2025-08-08 22:00:22,410 - INFO - System inspection completed
+2025-08-08 22:04:16,918 - INFO - Starting system inspection
+2025-08-08 22:04:26,282 - WARNING - Failed to check cron jobs: 'utf-8' codec can't decode byte 0xce in position 2: invalid continuation byte
+2025-08-08 22:04:26,282 - WARNING - Log file not found: C:\Windows\System32\LogFiles\AppEvent.evt
+2025-08-08 22:04:26,511 - INFO - HTML report generated: my_report.html
+2025-08-08 22:04:26,523 - INFO - JSON report generated: my_report.json
+2025-08-08 22:04:26,524 - INFO - System inspection completed
+2025-08-08 22:09:45,616 - INFO - Starting system inspection
+2025-08-08 22:09:55,259 - WARNING - Log file not found: C:\Windows\System32\LogFiles\AppEvent.evt
+2025-08-08 22:09:55,641 - INFO - HTML report generated: my_report.html
+2025-08-08 22:09:55,654 - INFO - JSON report generated: my_report.json
+2025-08-08 22:09:55,654 - INFO - System inspection completed
+2025-08-09 11:29:46,468 - INFO - Starting system inspection
+2025-08-09 11:29:55,971 - WARNING - Log file not found: C:\Windows\System32\LogFiles\AppEvent.evt
+2025-08-09 11:29:56,221 - INFO - HTML report generated: report.html
+2025-08-09 11:29:56,229 - INFO - JSON report generated: report.json
+2025-08-09 11:29:56,230 - INFO - System inspection completed

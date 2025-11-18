@@ -1,0 +1,107 @@
+
+        <html>
+        <head>
+            <title>System Inspection Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                h1 { color: #333; }
+                h2 { color: #444; margin-top: 30px; }
+                table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                .warning { background-color: #fff3cd; }
+                .error { background-color: #f8d7da; }
+                .success { background-color: #d4edda; }
+            </style>
+        </head>
+        <body>
+            <h1>System Inspection Report</h1>
+            <p>Generated at: 2025-08-09 11:29:56</p>
+
+            <h2>System Information</h2>
+            <table><tr><th>Key</th><th>Value</th></tr><tr><td>system</td><td>Windows</td></tr><tr><td>node</td><td>zhoule</td></tr><tr><td>release</td><td>11</td></tr><tr><td>version</td><td>10.0.26100</td></tr><tr><td>machine</td><td>AMD64</td></tr><tr><td>processor</td><td>AMD64 Family 25 Model 117 Stepping 2, AuthenticAMD</td></tr><tr><td>cpu_count</td><td>16</td></tr><tr><td>boot_time</td><td>2025-08-09 09:53:03</td></tr></table>
+
+            <h2>CPU Information</h2>
+            <table><tr><th>Key</th><th>Value</th></tr><tr><td>physical_cores</td><td>8</td></tr><tr><td>total_cores</td><td>16</td></tr><tr><td>cpu_usage</td><td>[1.6, 0.0, 22.7, 18.8, 6.3, 7.8, 0.0, 0.0, 0.0, 0.0, 23.4, 26.2, 0.0, 0.0, 4.8, 0.0]</td></tr><tr><td>cpu_freq</td><td>3801.0</td></tr></table>
+
+            <h2>Memory Information</h2>
+            <table><tr><th>Key</th><th>Value</th></tr><tr><td>total_memory</td><td>29.75 GB</td></tr><tr><td>available_memory</td><td>4.59 GB</td></tr><tr><td>used_memory</td><td>25.16 GB</td></tr><tr><td>memory_percent</td><td>84.6</td></tr><tr><td>total_swap</td><td>2.75 GB</td></tr><tr><td>used_swap</td><td>0.96 GB</td></tr><tr><td>swap_percent</td><td>34.8</td></tr></table>
+
+            <h2>Disk Information</h2>
+            <table><tr><th>device</th><th>free</th><th>fstype</th><th>mountpoint</th><th>percent</th><th>total</th><th>used</th></tr><tr><td>C:\</td><td>61.83 GB</td><td>NTFS</td><td>C:\</td><td>79.4</td><td>300.00 GB</td><td>238.17 GB</td></tr><tr><td>D:\</td><td>480.61 GB</td><td>NTFS</td><td>D:\</td><td>26.2</td><td>651.64 GB</td><td>171.03 GB</td></tr><tr><td>F:\</td><td>217.07 GB</td><td>NTFS</td><td>F:\</td><td>77.2</td><td>953.85 GB</td><td>736.78 GB</td></tr></table>
+
+            <h2>Network Information</h2>
+            <table><tr><th>bytes_recv</th><th>bytes_sent</th><th>dropin</th><th>dropout</th><th>errin</th><th>errout</th><th>interface</th><th>packets_recv</th><th>packets_sent</th></tr><tr><td>0.00 MB</td><td>0.00 MB</td><td>0</td><td>0</td><td>0</td><td>0</td><td>本地连接* 1</td><td>0</td><td>0</td></tr><tr><td>0.00 MB</td><td>0.00 MB</td><td>0</td><td>0</td><td>0</td><td>0</td><td>本地连接* 2</td><td>0</td><td>0</td></tr><tr><td>0.00 MB</td><td>0.00 MB</td><td>0</td><td>0</td><td>0</td><td>0</td><td>VMware Network Adapter VMnet1</td><td>13</td><td>1577</td></tr><tr><td>0.01 MB</td><td>0.01 MB</td><td>0</td><td>0</td><td>0</td><td>0</td><td>VMware Network Adapter VMnet8</td><td>5283</td><td>9549</td></tr><tr><td>1312.33 MB</td><td>366.30 MB</td><td>0</td><td>0</td><td>0</td><td>0</td><td>WLAN</td><td>1377109</td><td>916798</td></tr><tr><td>0.00 MB</td><td>0.00 MB</td><td>0</td><td>0</td><td>0</td><td>0</td><td>蓝牙网络连接</td><td>0</td><td>0</td></tr><tr><td>0.00 MB</td><td>0.00 MB</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Loopback Pseudo-Interface 1</td><td>0</td><td>0</td></tr></table>
+
+            <h2>Port Status</h2>
+            <table><tr><th>Key</th><th>Value</th></tr><tr><td>22</td><td>closed</td></tr><tr><td>80</td><td>closed</td></tr><tr><td>443</td><td>closed</td></tr><tr><td>3306</td><td>open</td></tr><tr><td>5432</td><td>closed</td></tr><tr><td>6379</td><td>closed</td></tr></table>
+
+            <h2>Service Status</h2>
+            <table><tr><th>Key</th><th>Value</th></tr><tr><td>MySQL</td><td>not_found</td></tr><tr><td>MSSQLSERVER</td><td>not_found</td></tr></table>
+
+            <h2>Error Logs</h2>
+            <p>No data available</p>
+
+            <h2>Security Checks</h2>
+            <h3>Sudoers File</h3>
+            <pre>Not a Linux system</pre>
+            <h3>SSH Config</h3>
+            <pre>Not a Linux system</pre>
+            <h3>Firewall Status</h3>
+            <pre>
+域配置文件 设置: 
+----------------------------------------------------------------------
+状态                                  启用
+防火墙策略                          BlockInbound,AllowOutbound
+LocalFirewallRules                    N/A (仅 GPO 存储)
+LocalConSecRules                      N/A (仅 GPO 存储)
+InboundUserNotification               启用
+RemoteManagement                      禁用
+UnicastResponseToMulticast            启用
+
+日志:
+LogAllowedConnections                 禁用
+LogDroppedConnections                 禁用
+FileName                              %systemroot%\system32\LogFiles\Firewall\pfirewall.log
+MaxFileSize                           4096
+
+
+专用配置文件 设置: 
+----------------------------------------------------------------------
+状态                                  启用
+防火墙策略                          BlockInbound,AllowOutbound
+LocalFirewallRules                    N/A (仅 GPO 存储)
+LocalConSecRules                      N/A (仅 GPO 存储)
+InboundUserNotification               启用
+RemoteManagement                      禁用
+UnicastResponseToMulticast            启用
+
+日志:
+LogAllowedConnections                 禁用
+LogDroppedConnections                 禁用
+FileName                              %systemroot%\system32\LogFiles\Firewall\pfirewall.log
+MaxFileSize                           4096
+
+
+公用配置文件 设置: 
+----------------------------------------------------------------------
+状态                                  启用
+防火墙策略                          BlockInbound,AllowOutbound
+LocalFirewallRules                    N/A (仅 GPO 存储)
+LocalConSecRules                      N/A (仅 GPO 存储)
+InboundUserNotification               启用
+RemoteManagement                      禁用
+UnicastResponseToMulticast            启用
+
+日志:
+LogAllowedConnections                 禁用
+LogDroppedConnections                 禁用
+FileName                              %systemroot%\system32\LogFiles\Firewall\pfirewall.log
+MaxFileSize                           4096
+
+确定。
+
+</pre>
+        </body>
+        </html>
+        

@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}主机管理 - PyOps{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>主机管理</h1>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addHostModal">
+            <i class="fa fa-plus"></i> 添加主机
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>主机名/IP</th>
+                        <th>端口</th>
+                        <th>用户名</th>
+                        <th>分组</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 主机数据将通过JavaScript动态加载 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 添加主机模态框 -->
+<div class="modal fade" id="addHostModal" tabindex="-1" aria-labelledby="addHostModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addHostModalLabel">添加主机</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="add-host-form">
+    <div class="mb-3">
+        <label for="host-name" class="form-label">主机名称</label>
+        <input type="text" class="form-control" id="host-name" name="name" required>
+    </div>
+    <div class="mb-3">
+        <label for="host-hostname" class="form-label">主机名/IP</label>
+        <input type="text" class="form-control" id="host-hostname" name="hostname" required>
+    </div>
+    <div class="mb-3">
+        <label for="host-port" class="form-label">端口</label>
+        <input type="number" class="form-control" id="host-port" name="port" value="22">
+    </div>
+    <div class="mb-3">
+        <label for="host-username" class="form-label">用户名</label>
+        <input type="text" class="form-control" id="host-username" name="username" required>
+    </div>
+    <div class="mb-3">
+        <label for="host-password" class="form-label">密码</label>
+        <input type="password" class="form-control" id="host-password" name="password">
+    </div>
+    <div class="mb-3">
+        <label for="host-group" class="form-label">主机分组</label>
+        <select class="form-select" id="host-group" name="group_id">
+            <option value="">未分组</option>
+            <!-- 分组选项将通过JavaScript动态加载 -->
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="host-description" class="form-label">描述</label>
+        <textarea class="form-control" id="host-description" name="description" rows="3"></textarea>
+    </div>
+</form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 页面加载时获取主机数据和分组数据
+    document.addEventListener('DOMContentLoaded', function() {
+        loadHosts();
+        loadGroups();
+
+        // 保存按钮点击事件
+        document.querySelector('.modal-footer .btn-primary').addEventListener('click', function() {
+            submitHostForm();
+        });
+    });
+
+    // 加载主机数据
+    function loadHosts() {
+        fetch('/host')
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 0) {
+                    const tbody = document.querySelector('tbody');
+                    tbody.innerHTML = '';
+                    data.data.forEach(host => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${host.name}</td>
+                            <td>${host.hostname}</td>
+                            <td>${host.port}</td>
+                            <td>${host.username}</td>
+                            <td>${host.group_name || '未分组'}</td>
+                            <td><span class="badge bg-success">在线</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-info" onclick="editHost(${host.id})">编辑</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteHost(${host.id})">删除</button>
+                                <button class="btn btn-sm btn-secondary" onclick="remoteTerminal(${host.id})">远程终端</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            });
+    }
+
+    // 加载分组数据
+    function loadGroups() {
+        fetch('/host/groups')
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 0) {
+                    const groupSelect = document.getElementById('host-group');
+                    data.data.forEach(group => {
+                        const option = document.createElement('option');
+                        option.value = group.id;
+                        option.textContent = group.name;
+                        groupSelect.appendChild(option);
+                    });
+                }
+            });
+    }
+
+    // 提交主机表单
+    function submitHostForm() {
+        const form = document.getElementById('add-host-form');
+        const formData = new FormData(form);
+        const hostData = Object.fromEntries(formData.entries());
+
+        fetch('/host', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(hostData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.code === 0) {
+                // 关闭模态框
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addHostModal'));
+                modal.hide();
+                // 重置表单
+                form.reset();
+                // 重新加载主机数据
+                loadHosts();
+                alert('主机添加成功');
+            } else {
+                alert('添加失败: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('添加主机出错:', error);
+            alert('添加主机出错');
+        });
+    }
+
+    // 删除主机
+    function deleteHost(hostId) {
+        if (confirm('确定要删除这台主机吗?')) {
+            fetch(`/host/${hostId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 0) {
+                    loadHosts();
+                    alert('主机删除成功');
+                } else {
+                    alert('删除失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('删除主机出错:', error);
+                alert('删除主机出错');
+            });
+        }
+    }
+
+    // 编辑主机
+    function editHost(hostId) {
+        // 这里添加编辑主机的逻辑
+        alert('编辑主机功能将在后续实现');
+    }
+
+    // 远程终端
+    function remoteTerminal(hostId) {
+        // 这里添加远程终端的逻辑
+        window.location.href = `/terminal?host_id=${hostId}`;
+    }
+</script>
+{% endblock %}

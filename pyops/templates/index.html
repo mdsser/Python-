@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}仪表盘 - PyOps{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">欢迎使用 PyOps</h1>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">主机数量</h5>
+                            <p class="display-4">10</p>
+                        </div>
+                        <i class="fas fa-server fa-3x"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a href="/host" class="text-white">查看详情</a>
+                    <i class="fas fa-angle-right"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">部署任务</h5>
+                            <p class="display-4">5</p>
+                        </div>
+                        <i class="fas fa-rocket fa-3x"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a href="/deploy" class="text-white">查看详情</a>
+                    <i class="fas fa-angle-right"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-warning text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">监控项</h5>
+                            <p class="display-4">24</p>
+                        </div>
+                        <i class="fas fa-chart-line fa-3x"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a href="/monitor" class="text-white">查看详情</a>
+                    <i class="fas fa-angle-right"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-info text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">任务计划</h5>
+                            <p class="display-4">8</p>
+                        </div>
+                        <i class="fas fa-calendar-alt fa-3x"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a href="/schedule" class="text-white">查看详情</a>
+                    <i class="fas fa-angle-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">最近部署</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>项目A - v1.0.0</span>
+                            <span class="badge bg-success">成功</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>项目B - v2.1.3</span>
+                            <span class="badge bg-success">成功</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>项目C - v0.5.2</span>
+                            <span class="badge bg-danger">失败</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">系统状态</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="systemStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 系统状态图表
+        const ctx = document.getElementById('systemStatusChart').getContext('2d');
+        const systemStatusChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['正常', '警告', '异常'],
+                datasets: [{
+                    data: [8, 2, 0],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.7)',
+                        'rgba(255, 193, 7, 0.7)',
+                        'rgba(220, 53, 69, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgb(40, 167, 69)',
+                        'rgb(255, 193, 7)',
+                        'rgb(220, 53, 69)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+    <div class="main-content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1 class="mt-4 mb-4">仪表盘</h1>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fa fa-server"></i> 主机总数</h5>
+                                    <p class="card-text display-4">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fa fa-rocket"></i> 部署任务</h5>
+                                    <p class="card-text display-4">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fa fa-calendar"></i> 计划任务</h5>
+                                    <p class="card-text display-4">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fa fa-exclamation-triangle"></i> 告警信息</h5>
+                                    <p class="card-text display-4">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}远程终端 - PyOps{% endblock %}
+
+{% block extra_css %}
+<style>
+    #terminal-container {
+        width: 100%;
+        height: 600px;
+        background-color: #1e1e1e;
+        color: #fff;
+        border-radius: 5px;
+        overflow: hidden;
+        position: relative;
+    }
+    #terminal-header {
+        background-color: #333;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+    }
+    #terminal-title {
+        flex-grow: 1;
+        text-align: center;
+    }
+    #terminal-body {
+        padding: 10px;
+        height: calc(100% - 40px);
+        overflow-y: auto;
+        font-family: monospace;
+    }
+    #terminal-input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        color: #fff;
+        font-family: monospace;
+        outline: none;
+    }
+    .command-prompt {
+        color: #00ff00;
+    }
+    .command-output {
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3>远程终端</h3>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="host-select" class="form-label">选择主机</label>
+                <select id="host-select" class="form-select">
+                    <option value="">加载中...</option>
+                </select>
+            </div>
+            <div id="terminal-container">
+                <div id="terminal-header">
+                    <div class="terminal-buttons">
+                        <span class="btn-close btn-close-white me-1"></span>
+                        <span class="btn-close btn-close-white me-1"></span>
+                        <span class="btn-close btn-close-white"></span>
+                    </div>
+                    <div id="terminal-title">连接到: <span id="connected-host">未连接</span></div>
+                    <div>
+                        <button id="connect-btn" class="btn btn-sm btn-success">连接</button>
+                    </div>
+                </div>
+                <div id="terminal-body"></div>
+                <div style="display: flex; align-items: center;">
+                    <span class="command-prompt">$ </span>
+                    <input type="text" id="terminal-input" autocomplete="off">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const hostSelect = document.getElementById('host-select');
+        const connectBtn = document.getElementById('connect-btn');
+        const terminalBody = document.getElementById('terminal-body');
+        const terminalInput = document.getElementById('terminal-input');
+        const connectedHost = document.getElementById('connected-host');
+        let socket = null;
+        let selectedHostId = null;
+
+        // 加载主机列表
+        fetch('/host')
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 0) {
+                    hostSelect.innerHTML = '';
+                    data.data.forEach(host => {
+                        const option = document.createElement('option');
+                        option.value = host.id;
+                        option.textContent = `${host.name} (${host.hostname}:${host.port})`;
+                        hostSelect.appendChild(option);
+                    });
+                }
+            });
+
+        // 检查URL参数中是否有host_id
+        const urlParams = new URLSearchParams(window.location.search);
+        const hostId = urlParams.get('host_id');
+        if (hostId) {
+            hostSelect.value = hostId;
+        }
+
+        // 连接按钮点击事件
+        connectBtn.addEventListener('click', function() {
+            if (socket) {
+                socket.close();
+                socket = null;
+                connectBtn.textContent = '连接';
+                terminalBody.innerHTML = '';
+                connectedHost.textContent = '未连接';
+                return;
+            }
+
+            selectedHostId = hostSelect.value;
+            if (!selectedHostId) {
+                alert('请选择主机');
+                return;
+            }
+
+            // 获取主机信息
+            fetch(`/host/${selectedHostId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 0) {
+                        const host = data.data;
+                        connectedHost.textContent = `${host.name} (${host.hostname}:${host.port})`;
+                        connectBtn.textContent = '断开连接';
+                        terminalBody.innerHTML = `<div class="command-output">正在连接到 ${host.hostname}:${host.port}...</div>`;
+
+                        // 这里应该建立WebSocket连接
+                        // 为了简化，我们使用模拟数据
+                        setTimeout(() => {
+                            terminalBody.innerHTML += `<div class="command-output">连接成功！</div>`;
+                            terminalBody.innerHTML += `<div class="command-output">Welcome to PyOps Terminal</div>`;
+                            terminalInput.focus();
+                        }, 1000);
+                    }
+                });
+        });
+
+        // 终端输入事件
+        terminalInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const command = terminalInput.value;
+                terminalInput.value = '';
+
+                if (!socket) {
+                    terminalBody.innerHTML += `<div class="command-output"><span class="command-prompt">$ ${command}</span></div>`;
+                    terminalBody.innerHTML += `<div class="command-output">未连接到主机，请先点击连接按钮</div>`;
+                    return;
+                }
+
+                terminalBody.innerHTML += `<div class="command-output"><span class="command-prompt">$ ${command}</span></div>`;
+
+                // 这里应该发送命令到服务器
+                // 为了简化，我们返回模拟结果
+                setTimeout(() => {
+                    terminalBody.innerHTML += `<div class="command-output">模拟命令执行结果: ${command}</div>`;
+                    terminalBody.scrollTop = terminalBody.scrollHeight;
+                }, 500);
+            }
+        });
+    });
+</script>
+{% endblock %}

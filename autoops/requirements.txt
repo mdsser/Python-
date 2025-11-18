@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+Flask-WTF
+Flask-Bootstrap
+paramiko
+APScheduler
+requests
+python-dotenv
+PyMySQL

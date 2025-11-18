@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}账号管理 - PyOps{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">账号管理</h1>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">个人资料</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <img src="https://via.placeholder.com/150" class="rounded-circle" alt="用户头像">
+                    </div>
+                    <div id="profile-info">
+                        <!-- 个人资料将通过JavaScript动态加载 -->
+                    </div>
+                    <button class="btn btn-primary w-100 mt-4" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        编辑资料
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">修改密码</h5>
+                </div>
+                <div class="card-body">
+                    <form id="change-password-form">
+                        <div class="mb-3">
+                            <label for="old-password" class="form-label">原密码</label>
+                            <input type="password" class="form-control" id="old-password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new-password" class="form-label">新密码</label>
+                            <input type="password" class="form-control" id="new-password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm-password" class="form-label">确认新密码</label>
+                            <input type="password" class="form-control" id="confirm-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">保存修改</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">账号列表</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>用户名</th>
+                                <th>邮箱</th>
+                                <th>角色</th>
+                                <th>创建时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 账号数据将通过JavaScript动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑资料模态框 -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel">编辑个人资料</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- 编辑资料表单 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 页面加载时获取个人资料
+    document.addEventListener('DOMContentLoaded', function() {
+        // 获取个人资料
+        fetch('/account/profile')
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 0) {
+                    const profileInfo = document.getElementById('profile-info');
+                    profileInfo.innerHTML = `
+                        <p><strong>用户名:</strong> ${data.data.username}</p>
+                        <p><strong>邮箱:</strong> ${data.data.email}</p>
+                        <p><strong>角色:</strong> ${data.data.role}</p>
+                        <p><strong>创建时间:</strong> ${data.data.created_at}</p>
+                    `;
+                }
+            });
+
+        // 获取账号列表
+        fetch('/account')
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 0) {
+                    const tbody = document.querySelector('tbody');
+                    data.data.forEach(account => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${account.username}</td>
+                            <td>${account.email}</td>
+                            <td>${account.role}</td>
+                            <td>${account.created_at}</td>
+                            <td><span class="badge bg-${account.status === 'active' ? 'success' : 'secondary'}">${account.status}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-info">编辑</button>
+                                <button class="btn btn-sm btn-danger">删除</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            });
+
+        // 修改密码表单提交
+        document.getElementById('change-password-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // 这里添加密码修改逻辑
+            alert('密码修改功能将在后续实现');
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}任务计划 - PyOps{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>任务计划</h1>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addScheduleModal">
+            <i class="fa fa-plus"></i> 新建任务
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>任务名称</th>
+                        <th>执行命令</th>
+                        <th>执行周期</th>
+                        <th>下次执行时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 任务数据将通过JavaScript动态加载 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 新建任务模态框 -->
+<div class="modal fade" id="addScheduleModal" tabindex="-1" aria-labelledby="addScheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addScheduleModalLabel">新建任务计划</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- 新建任务表单 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 页面加载时获取任务数据
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/schedule')
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 0) {
+                    const tbody = document.querySelector('tbody');
+                    data.data.forEach(schedule => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${schedule.name}</td>
+                            <td>${schedule.command}</td>
+                            <td>${schedule.cron_expression}</td>
+                            <td>${schedule.next_run_time}</td>
+                            <td><span class="badge bg-${schedule.status === 'active' ? 'success' : 'secondary'}">${schedule.status}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-info">编辑</button>
+                                <button class="btn btn-sm btn-danger">删除</button>
+                                <button class="btn btn-sm btn-primary">${schedule.status === 'active' ? '禁用' : '启用'}</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            });
+    });
+</script>
+{% endblock %}

@@ -18,6 +18,7 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
+# 记录来自该模板的记录
 logger = logging.getLogger(__name__)
 
 

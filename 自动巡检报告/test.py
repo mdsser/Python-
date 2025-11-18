@@ -219,7 +219,11 @@ class ServiceInspector:
                             jobs.append(line.strip())
             elif platform.system() == 'Windows':
                 output = subprocess.check_output(['schtasks', '/query', '/fo', 'LIST'], stderr=subprocess.STDOUT)
-                output = output.decode('utf-8')
+                # 尝试使用gbk编码解码，如果失败再使用utf-8
+                try:
+                    output = output.decode('gbk')
+                except UnicodeDecodeError:
+                    output = output.decode('utf-8', errors='ignore')
                 jobs = output.split('\n')
         except Exception as e:
             logger.warning(f"Failed to check cron jobs: {str(e)}")
@@ -655,7 +659,12 @@ def main():
     if platform.system() == 'Linux':
         data['error_logs'] = LogInspector.check_error_logs('/var/log/syslog')
     elif platform.system() == 'Windows':
-        data['error_logs'] = LogInspector.check_error_logs('C:\\Windows\\System32\\LogFiles\\AppEvent.evt')
+        log_path = 'C:\\Windows\\System32\\LogFiles\\AppEvent.evt'
+        if os.path.exists(log_path):
+            data['error_logs'] = LogInspector.check_error_logs(log_path)
+        else:
+            logger.warning(f"Log file not found: {log_path}")
+            data['error_logs'] = []
 
     # 安全检查
     data['sudoers'] = SecurityInspector.check_sudoers()

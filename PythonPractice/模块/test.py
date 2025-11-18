@@ -3,4 +3,4 @@ def add(a, b):
 
 if __name__ == '__main__':
     result = add(11, 22)
-    print('int test.py file,_name_is %s'%_name_)
+    print('int test自动化部署(从Git拉取代码).py file,_name_is %s'%_name_)
